@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Key System</title>
+    <style>
+        body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #ffffff; font-family: Arial, sans-serif; }
+        .container { text-align: center; padding: 25px; border: 2px solid #e8e8e8; border-radius: 14px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); background: #ffffff; max-width: 360px; width: 85%; }
+        h2 { color: #222222; margin-bottom: 20px; font-size: 20px; font-weight: bold; text-transform: uppercase; }
+        .key-box { font-size: 24px; font-weight: bold; letter-spacing: 1px; padding: 16px; border: 2px dashed #0088cc; background-color: #f4fafd; color: #0088cc; margin-bottom: 20px; border-radius: 8px; word-break: break-all; }
+        .btn-copy { background-color: #0088cc; color: white; border: none; padding: 14px 20px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; transition: background 0.2s; }
+        .btn-copy:hover { background-color: #006699; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Key Của Bạn</h2>
+    <div class="key-box" id="keyDisplay">...</div>
+    <button class="btn-copy" onclick="copyAndRedirect()">Sao chép Key</button>
+</div>
+
+<script>
+    function generate24hRandomKey() {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        
+        // 1. Tạo ngẫu nhiên 4 ký tự đầu
+        let randomPart = "";
+        for (let i = 0; i < 4; i++) {
+            randomPart += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        
+        // 2. Lấy ngày UTC đồng bộ với Script
+        const now = new Date();
+        const dateStr = now.getUTCFullYear() + String(now.getUTCMonth() + 1).padStart(2, '0') + String(now.getUTCDate()).padStart(2, '0');
+        
+        // 3. Trộn thuật toán băm mã hóa 5 ký tự đuôi
+        const mixStr = randomPart + dateStr + "HIRU";
+        let hash = 0;
+        for (let i = 0; i < mixStr.length; i++) {
+            hash = (hash * 31 + mixStr.charCodeAt(i)) % 1000000;
+        }
+        
+        let hashPart = "";
+        let tempHash = hash;
+        for (let i = 0; i < 5; i++) {
+            hashPart += chars.charAt(tempHash % chars.length);
+            tempHash = Math.floor(tempHash / chars.length);
+        }
+        
+        return randomPart + hashPart;
+    }
+
+    const currentKey = generate24hRandomKey();
+    document.getElementById("keyDisplay").innerText = currentKey;
+
+    function copyAndRedirect() {
+        const textArea = document.createElement("textarea");
+        textArea.value = currentKey;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try { document.execCommand('copy'); } catch (err) {}
+        document.body.removeChild(textArea);
+        
+        window.location.href = "https://t.me/tamnguyenmod";
+    }
+</script>
+</body>
+</html>
